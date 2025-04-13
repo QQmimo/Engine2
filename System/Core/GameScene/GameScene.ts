@@ -1,0 +1,62 @@
+import { BaseObject, GameLayer } from "..";
+
+export class GameScene extends BaseObject {
+    constructor(name?: string) {
+        super(name);
+        this.Layers = new Map<string, GameLayer>();
+    }
+
+    //#region FIELDS
+    private readonly Layers: Map<string, GameLayer>;
+    private get LayersAsArray(): GameLayer[] {
+        return Array.from(this.Layers, ([key, value]) => value);
+    }
+    //#endregion
+
+    //#region EVENTS
+    private _onAddLayer?: (layer: GameLayer) => void;
+    public onAddLayer(action: (layer: GameLayer) => void): void {
+        this._onAddLayer = action;
+    }
+    //#endregion
+
+    //#region METHODS
+    public update(deltaTime: number): void {
+        this.Layers.forEach(layer => layer.update(deltaTime));
+    }
+    public addLayer(id?: string): GameLayer {
+        const layer: GameLayer = new GameLayer(id);
+        if (this.findLayerById(layer.Id) !== null) {
+            throw new Error(`ОШИБКА: ${layer.constructor.name} с идентификатором '${layer.Id}' уже существует.`);
+        }
+        this.Layers.set(layer.Id, layer);
+        this._onAddLayer?.apply(this, [layer]);
+        return layer;
+    }
+    public destroyLayer(id: string): void {
+        this.findLayerById(id)?.destroy();
+    }
+    public findLayerById(id: string): GameLayer | null {
+        return this.Layers.get(id) ?? null;
+    }
+    public destroy(): void {
+        this.Layers.forEach(layer => layer.destroy());
+        super.destroy();
+    }
+    //#endregion
+
+    //#region GLOBAL
+    public static findById(id: string): GameLayer | null {
+        return super.findById(id) as GameLayer;
+    }
+    public static findByName(name: string): GameLayer | null {
+        return super.findByName(name) as GameLayer;
+    }
+    public static findByTag(tag: string): GameLayer[] {
+        return super.findByTag(tag) as GameLayer[];
+    }
+    public static showAll(): GameLayer[] {
+        return super.showAll() as GameLayer[];
+    }
+    //#endregion
+}
