@@ -1,16 +1,15 @@
-import { BaseObject, GameObject } from "..";
+import { BaseObject, GameObject, GameScene } from "..";
 
 export class GameLayer extends BaseObject {
-    constructor(name?: string) {
-        super(name);
+    constructor(scene: GameScene, name?: string) {
+        super(name ?? `GameLayer_${GameLayer.showAll().length + 1}`);
         this.Objects = new Map<string, GameObject>();
+        this.Scene = scene;
     }
 
     //#region FIELDS
     private readonly Objects: Map<string, GameObject>;
-    private get ObjectsAsArray(): GameObject[] {
-        return Array.from(this.Objects, ([key, value]) => value);
-    }
+    public readonly Scene: GameScene;
     //#endregion
 
     //#region EVENTS
@@ -24,11 +23,16 @@ export class GameLayer extends BaseObject {
     public update(deltaTime: number): void {
         this.Objects.forEach(object => object.update(deltaTime));
     }
-    public addObject(name?: string): GameObject {
-        const object: GameObject = new GameObject(name);
+    public createObject(name?: string): GameObject {
+        const object: GameObject = new GameObject(this, name);
         if (this.findObjectById(object.Id) !== null) {
             throw new Error(`ОШИБКА: ${object.constructor.name} с идентификатором '${object.Id}' уже существует.`);
         }
+        this.Objects.set(object.Id, object);
+        this._onAddObject?.apply(this, [object]);
+        return object;
+    }
+    public addObject(object: GameObject): GameObject {
         this.Objects.set(object.Id, object);
         this._onAddObject?.apply(this, [object]);
         return object;
@@ -46,17 +50,17 @@ export class GameLayer extends BaseObject {
     //#endregion
 
     //#region GLOBAL
-    public static findById(id: string): GameObject | null {
-        return super.findById(id) as GameObject;
+    public static findById(id: string): GameLayer | null {
+        return super.findById(id) as GameLayer;
     }
-    public static findByName(name: string): GameObject | null {
-        return super.findByName(name) as GameObject;
+    public static findByName(name: string): GameLayer | null {
+        return super.findByName(name) as GameLayer;
     }
-    public static findByTag(tag: string): GameObject[] {
-        return super.findByTag(tag) as GameObject[];
+    public static selectByTag(tag: string): GameLayer[] {
+        return super.selectByTag(tag) as GameLayer[];
     }
-    public static showAll(): GameObject[] {
-        return super.showAll() as GameObject[];
+    public static showAll(): GameLayer[] {
+        return super.showAll() as GameLayer[];
     }
     //#endregion
 }

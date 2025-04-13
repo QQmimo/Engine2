@@ -1,9 +1,9 @@
-import { Guid } from "System/Types";
+import { Guid } from "System/Utilities";
 
 export class BaseObject {
-    constructor(name?: string) {
+    constructor(name: string) {
         this.Id = Guid.new();
-        this.Name = name ?? `${this.constructor.name}_${BaseObject.All.values.length + 1}`;
+        this.Name = name;
         this.Tags = [];
         BaseObject.add(this);
     }
@@ -29,15 +29,14 @@ export class BaseObject {
         BaseObject.delete(this.Id);
         this._onDestroy?.apply(this);
     }
-    public update(deltaTime: number): void {
-
-    };
     //#endregion
 
     //#region GLOBAL
     protected static All: Map<string, BaseObject> = new Map();
     protected static get AllAsArray(): BaseObject[] {
-        return Array.from(this.All, ([key, value]) => value);
+        return Array
+            .from(this.All, ([_key, value]) => value)
+            .filter(object => object.constructor.name === this.name);
     }
 
     protected static add(object: BaseObject): void {
@@ -53,7 +52,7 @@ export class BaseObject {
     public static findByName(name: string): BaseObject | null {
         return (this.AllAsArray as BaseObject[]).find(object => this.name === object.constructor.name && object.Name === name) ?? null;
     }
-    public static findByTag(tag: string): BaseObject[] {
+    public static selectByTag(tag: string): BaseObject[] {
         return (this.AllAsArray as BaseObject[]).filter(object => object.Tags.includes(tag));
     }
     public static showAll(): BaseObject[] {

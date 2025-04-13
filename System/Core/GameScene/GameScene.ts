@@ -1,16 +1,15 @@
-import { BaseObject, GameLayer } from "..";
+import { BaseObject, GameLayer, GameScreen } from "..";
 
 export class GameScene extends BaseObject {
-    constructor(name?: string) {
-        super(name);
+    constructor(screen: GameScreen, name?: string) {
+        super(name ?? `GameScene_${GameScene.showAll().length + 1}`);
         this.Layers = new Map<string, GameLayer>();
+        this.Screen = screen;
     }
 
     //#region FIELDS
     private readonly Layers: Map<string, GameLayer>;
-    private get LayersAsArray(): GameLayer[] {
-        return Array.from(this.Layers, ([key, value]) => value);
-    }
+    public readonly Screen: GameScreen;
     //#endregion
 
     //#region EVENTS
@@ -25,7 +24,7 @@ export class GameScene extends BaseObject {
         this.Layers.forEach(layer => layer.update(deltaTime));
     }
     public addLayer(id?: string): GameLayer {
-        const layer: GameLayer = new GameLayer(id);
+        const layer: GameLayer = new GameLayer(this, id);
         if (this.findLayerById(layer.Id) !== null) {
             throw new Error(`ОШИБКА: ${layer.constructor.name} с идентификатором '${layer.Id}' уже существует.`);
         }
@@ -52,8 +51,8 @@ export class GameScene extends BaseObject {
     public static findByName(name: string): GameLayer | null {
         return super.findByName(name) as GameLayer;
     }
-    public static findByTag(tag: string): GameLayer[] {
-        return super.findByTag(tag) as GameLayer[];
+    public static selectByTag(tag: string): GameLayer[] {
+        return super.selectByTag(tag) as GameLayer[];
     }
     public static showAll(): GameLayer[] {
         return super.showAll() as GameLayer[];

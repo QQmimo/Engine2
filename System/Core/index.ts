@@ -1,3 +1,4 @@
+export * from "./BaseComponent/BaseComponent";
 export * from "./BaseObject/BaseObject";
 export * from "./GameScreen/GameScreen";
 export * from "./GameScene/GameScene";

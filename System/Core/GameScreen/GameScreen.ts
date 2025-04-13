@@ -1,44 +1,31 @@
 import { BaseObject, GameScene } from "..";
 
 export class GameScreen extends BaseObject {
-    constructor(target: HTMLElement, name?: string, width?: number, height?: number) {
-        super(name);
+    constructor(target: HTMLElement, name?: string, _width?: number, _height?: number) {
+        super(name ?? `GameScreen_${GameScreen.showAll().length + 1}`);
         this.Scenes = new Map<string, GameScene>();
         this._Canvas = document.createElement('canvas');
-        this._Context = this._Canvas.getContext('2d');
+        this.Context = this._Canvas.getContext('2d');
         target.appendChild(this._Canvas);
 
-        this._setSize(width, height);
-
-        window.addEventListener('resize', (e) => {
-            this._setSize(innerWidth, innerHeight);
+        this._setSize();
+        window.addEventListener('resize', () => {
+            this._setSize();
         });
     }
 
-    private _setSize(width?: number, height?: number): void {
-        if (width !== undefined && width !== null) {
-            this._Canvas.width = width!;
-        }
-        else {
-            this._Canvas.width = this._Canvas.parentElement!.offsetWidth;
-        }
-        if (height !== undefined && height !== null) {
-            this._Canvas.height = height!;
-        }
-        else {
-            this._Canvas.height = this._Canvas.parentElement!.offsetHeight;
-        }
+    private _setSize(): void {
+        this._Canvas.width = innerWidth;
+        this._Canvas.height = innerHeight;
+        this._Canvas.style.cssText = 'position: absolute; top: 0; left: 0;';
     }
     private _LastTime: number = 0;
     private _Loop: number = 0;
 
     //#region FIELDS
     private readonly Scenes: Map<string, GameScene>;
-    private get ScenesAsArray(): GameScene[] {
-        return Array.from(this.Scenes, ([key, value]) => value);
-    }
     private readonly _Canvas: HTMLCanvasElement;
-    private readonly _Context: CanvasRenderingContext2D | null;
+    public readonly Context: CanvasRenderingContext2D | null;
     public get Width(): number {
         return this._Canvas.width;
     }
@@ -56,7 +43,7 @@ export class GameScreen extends BaseObject {
 
     //#region METHODS
     public addScene(name?: string): GameScene {
-        const scene: GameScene = new GameScene(name);
+        const scene: GameScene = new GameScene(this, name);
         if (this.findSceneById(scene.Id) !== null) {
             throw new Error(`ОШИБКА: ${scene.constructor.name} с идентификатором '${scene.Id}' уже существует.`);
         }
@@ -71,11 +58,11 @@ export class GameScreen extends BaseObject {
         return this.Scenes.get(id) ?? null;
     }
     public update(deltaTime: number): void {
-        this._Context?.clearRect(0, 0, this.Width, this.Height);
-        this.ScenesAsArray
+        this.Context?.clearRect(0, 0, this.Width, this.Height);
+        this.Scenes
             .forEach(scene => {
                 scene.update(deltaTime);
-                this._Context?.restore();
+                this.Context?.restore();
             });
     }
     public play = (currentTime: number = 0): void => {
@@ -88,6 +75,7 @@ export class GameScreen extends BaseObject {
         cancelAnimationFrame(this._Loop);
     }
     public destroy(): void {
+        this._Canvas.parentElement?.removeChild(this._Canvas);
         this.Scenes.forEach(scene => scene.destroy());
         super.destroy();
     }
@@ -100,8 +88,8 @@ export class GameScreen extends BaseObject {
     public static findByName(name: string): GameScreen | null {
         return super.findByName(name) as GameScreen;
     }
-    public static findByTag(tag: string): GameScreen[] {
-        return super.findByTag(tag) as GameScreen[];
+    public static selectByTag(tag: string): GameScreen[] {
+        return super.selectByTag(tag) as GameScreen[];
     }
     public static showAll(): GameScreen[] {
         return this.AllAsArray as GameScreen[];
