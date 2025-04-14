@@ -10,7 +10,7 @@ for (let i: number = 0; i < 450; i++) {
     const obj: GameObject = new GameObject(layer);
     obj.Transform.Position = Random.Vector2D(screen.Width, screen.Height);
     obj.Transform.Size = new Size(Random.Integer(5, 15), 0);
-    obj.Transform.Fill = "#0f0";
+    obj.Transform.Fill = "green";
     obj.addComponent(Drawed);
     obj.addComponent(Moved);
     obj.addComponent(Physic);
@@ -25,14 +25,10 @@ for (let i: number = 0; i < 450; i++) {
     const physic: Physic = obj.getComponent(Physic);
     physic.Mass = Random.Integer(obj.Transform.Size.Width, 15);
     physic.onCollision((o) => {
-        o.Transform.Fill = "#f00";
+        o.Transform.Fill = "red";
         setTimeout(() => {
-            o.Transform.Fill = "grey";
+            o.Transform.Fill = "green";
         }, 200);
-        setTimeout(() => {
-            o.getComponent(Moved).Target = Random.Vector2D(screen.Width, screen.Height);
-            o.Transform.Fill = "#0f0";
-        }, 2000);
     });
 }
 

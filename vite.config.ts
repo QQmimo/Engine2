@@ -6,7 +6,9 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      System: '/System/'
+      App: '/App',
+      System: '/System'
     }
-  }
+  },
+  base: './'
 })

@@ -5,7 +5,7 @@ import { Vector2D } from "System/Utilities";
 export class Physic extends BaseComponent {
     public Mass: number = 0;
 
-    private _getNeighbours(count: number = 10): GameObject[] {
+    private _getNeighbours(distance: number = 100): GameObject[] {
         const neighbours: GameObject[] = GameObject
             .selectByComponent(Physic)
             .filter(object => object.Id !== this.Object.Id)
@@ -13,17 +13,8 @@ export class Physic extends BaseComponent {
                 distance: this.Object.Transform.Position.distance(object.Transform.Position),
                 object: object
             }))
-            .sort((a, b) => {
-                if (a.distance > b.distance) {
-                    return 1;
-                }
-                else if (a.distance < b.distance) {
-                    return -1;
-                }
-                return 0;
-            })
-            .filter((_object, index) => index < count)
-            .map(object => object.object);
+            .filter(o => o.distance <= distance)
+            .map(o => o.object);
 
         return neighbours;
     }

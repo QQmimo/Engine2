@@ -7,7 +7,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "baseUrl": "./",
-    "rootDir": "..",
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -24,4 +23,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
+  "include": [
+    "App",
+    "System"
+  ]
 }
