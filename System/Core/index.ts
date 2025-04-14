@@ -4,3 +4,4 @@ export * from "./GameScreen/GameScreen";
 export * from "./GameScene/GameScene";
 export * from "./GameLayer/GameLayer";
 export * from "./GameObject/GameObject";
+export * from "./GameEngine/GameEngine";

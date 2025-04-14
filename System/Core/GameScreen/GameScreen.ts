@@ -1,4 +1,4 @@
-import { BaseObject, GameScene } from "..";
+import { BaseObject, GameEngine, GameScene } from "..";
 
 export class GameScreen extends BaseObject {
     constructor(target: HTMLElement, name?: string, _width?: number, _height?: number) {
@@ -21,6 +21,7 @@ export class GameScreen extends BaseObject {
     }
     private _LastTime: number = 0;
     private _Loop: number = 0;
+    private _GameEngine: GameEngine = new GameEngine();
 
     //#region FIELDS
     private readonly Scenes: Map<string, GameScene>;
@@ -58,6 +59,7 @@ export class GameScreen extends BaseObject {
         return this.Scenes.get(id) ?? null;
     }
     public update(deltaTime: number): void {
+        this._GameEngine.update(deltaTime);
         this.Context?.clearRect(0, 0, this.Width, this.Height);
         this.Scenes
             .forEach(scene => {

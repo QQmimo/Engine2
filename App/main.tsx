@@ -6,7 +6,7 @@ const screen: GameScreen = new GameScreen(document.body);
 const scene: GameScene = screen.addScene();
 const layer: GameLayer = scene.addLayer();
 
-for (let i: number = 0; i < 450; i++) {
+for (let i: number = 0; i < 500; i++) {
     const obj: GameObject = new GameObject(layer);
     obj.Transform.Position = Random.Vector2D(screen.Width, screen.Height);
     obj.Transform.Size = new Size(Random.Integer(5, 15), 0);
@@ -23,7 +23,7 @@ for (let i: number = 0; i < 450; i++) {
     });
 
     const physic: Physic = obj.getComponent(Physic);
-    physic.Mass = Random.Integer(obj.Transform.Size.Width, 15);
+    physic.Mass = obj.Transform.Size.Width;
     physic.onCollision((o) => {
         o.Transform.Fill = "red";
         setTimeout(() => {
