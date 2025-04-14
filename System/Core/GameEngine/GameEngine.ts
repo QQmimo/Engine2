@@ -19,7 +19,7 @@ export class GameEngine {
         this.Gravity = valueGravity;
     }
 
-    private _updatePhysic(deltaTime: number): void {
+    private _updatePhysic(_deltaTime: number): void {
         const objects: GameObject[] = GameObject.selectByComponent(Physic);
         for (let i: number = 0; i < objects.length; i++) {
             for (let j: number = objects.length - 1; j >= 0 && objects[i].Id !== objects[j].Id; j--) {
