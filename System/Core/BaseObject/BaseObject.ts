@@ -15,9 +15,13 @@ export class BaseObject {
     //#endregion
 
     //#region EVENTS
-    private _onDestroy?: () => void;
+    protected _onDestroy?: () => void;
     public onDestroy(action: () => void): void {
         this._onDestroy = action;
+    }
+    protected _onUpdate?: (deltatime: number) => void;
+    public onUpdate(action: (deltatime: number) => void): void {
+        this._onUpdate = action;
     }
     //#endregion
 

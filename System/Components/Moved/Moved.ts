@@ -16,14 +16,16 @@ export class Moved extends BaseComponent {
     public set Speed(value: number) {
         this._Speed = value;
     }
-    private _Target: Vector2D = this.Object.Transform.Position;
-    public get Target(): Vector2D {
+    private _Target: Vector2D | null = null;
+    public get Target(): Vector2D | null {
         return this._Target;
     }
-    public set Target(value: Vector2D) {
+    public set Target(value: Vector2D | null) {
         this._Target = value;
-        const distance: Vector2D = this._Target.subtract(this.Object.Transform.Position);
-        this._Velocity = distance.multiply(this.Speed / distance.length);
+        if (this._Target !== null) {
+            const distance: Vector2D = this._Target.subtract(this.Object.Transform.Position);
+            this._Velocity = distance.multiply(this.Speed / distance.length);
+        }
         this._onChangeTarget?.apply(this, [this.Object, this]);
     }
     private _IsMoving: boolean = false;
@@ -43,13 +45,15 @@ export class Moved extends BaseComponent {
     public onMoving(action: (object: GameObject, component: Moved) => void): void {
         this._onMoving = action;
     }
-    
+
     public update(deltaTime: number): void {
-        const distance: Vector2D = this.Target?.subtract(this.Object.Transform.Position);
-        if (distance.length < 1) {
-            this._IsMoving = false;
-            this._onFinish?.apply(this, [this.Object, this]);
-            return;
+        if (this.Target !== null) {
+            const distance: Vector2D = this.Target?.subtract(this.Object.Transform.Position);
+            if (distance.length < 1) {
+                this._IsMoving = false;
+                this._onFinish?.apply(this, [this.Object, this]);
+                return;
+            }
         }
         this.Object.Transform.Position = this.Object.Transform.Position.add(this._Velocity.multiply(deltaTime));
         this._IsMoving = true;

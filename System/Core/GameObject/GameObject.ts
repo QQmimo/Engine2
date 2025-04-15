@@ -47,6 +47,12 @@ export class GameObject extends BaseObject {
         this.Components.forEach(component => {
             component.update(deltaTime);
         });
+        this._onUpdate?.apply(this, [deltaTime]);
+    }
+
+    public destroy(): void {
+        this.Layer.destroyObject(this.Id);
+        super.destroy();
     }
     //#endregion
 

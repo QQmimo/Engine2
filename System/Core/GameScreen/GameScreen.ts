@@ -4,9 +4,9 @@ export class GameScreen extends BaseObject {
     constructor(target: HTMLElement, name?: string, _width?: number, _height?: number) {
         super(name ?? `GameScreen_${GameScreen.showAll().length + 1}`);
         this.Scenes = new Map<string, GameScene>();
-        this._Canvas = document.createElement('canvas');
-        this.Context = this._Canvas.getContext('2d');
-        target.appendChild(this._Canvas);
+        this.Canvas = document.createElement('canvas');
+        this.Context = this.Canvas.getContext('2d');
+        target.appendChild(this.Canvas);
 
         this._setSize();
         window.addEventListener('resize', () => {
@@ -15,9 +15,9 @@ export class GameScreen extends BaseObject {
     }
 
     private _setSize(): void {
-        this._Canvas.width = innerWidth;
-        this._Canvas.height = innerHeight;
-        this._Canvas.style.cssText = 'position: absolute; top: 0; left: 0;';
+        this.Canvas.width = innerWidth;
+        this.Canvas.height = innerHeight;
+        this.Canvas.style.cssText = 'position: absolute; top: 0; left: 0;';
     }
     private _LastTime: number = 0;
     private _Loop: number = 0;
@@ -25,13 +25,13 @@ export class GameScreen extends BaseObject {
 
     //#region FIELDS
     private readonly Scenes: Map<string, GameScene>;
-    private readonly _Canvas: HTMLCanvasElement;
+    public readonly Canvas: HTMLCanvasElement;
     public readonly Context: CanvasRenderingContext2D | null;
     public get Width(): number {
-        return this._Canvas.width;
+        return this.Canvas.width;
     }
     public get Height(): number {
-        return this._Canvas.height;
+        return this.Canvas.height;
     }
     //#endregion
 
@@ -77,7 +77,7 @@ export class GameScreen extends BaseObject {
         cancelAnimationFrame(this._Loop);
     }
     public destroy(): void {
-        this._Canvas.parentElement?.removeChild(this._Canvas);
+        this.Canvas.parentElement?.removeChild(this.Canvas);
         this.Scenes.forEach(scene => scene.destroy());
         super.destroy();
     }

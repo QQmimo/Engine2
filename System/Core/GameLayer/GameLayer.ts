@@ -38,7 +38,7 @@ export class GameLayer extends BaseObject {
         return object;
     }
     public destroyObject(id: string): void {
-        this.findObjectById(id)?.destroy();
+        this.Objects.delete(id);
     }
     public findObjectById(id: string): GameObject | null {
         return this.Objects.get(id) ?? null;

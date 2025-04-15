@@ -1,5 +1,6 @@
-import { Physic } from "System/Components";
+import { Moved, Physic } from "System/Components";
 import { GameObject } from "..";
+import { Vector2D } from "System/Utilities";
 
 export class GameEngine {
     private _Gravity: number = 0;
@@ -9,7 +10,7 @@ export class GameEngine {
     public set Gravity(value: number) {
         this._Gravity = value / this.MetrByPixels;
     }
-    private _MetrByPixels: number = 100;
+    private _MetrByPixels: number = 1;
     public get MetrByPixels(): number {
         return this._MetrByPixels
     };
@@ -22,6 +23,7 @@ export class GameEngine {
     private _updatePhysic(_deltaTime: number): void {
         const objects: GameObject[] = GameObject.selectByComponent(Physic);
         for (let i: number = 0; i < objects.length; i++) {
+            objects[i].getComponent(Moved).Velocity = new Vector2D(0, this._Gravity);
             for (let j: number = objects.length - 1; j >= 0 && objects[i].Id !== objects[j].Id; j--) {
                 objects[i].getComponent(Physic).checkCollision(objects[j]);
             }
