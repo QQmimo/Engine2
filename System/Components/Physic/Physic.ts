@@ -1,5 +1,5 @@
 import { BaseComponent, GameObject } from "System/Core";
-import { Moved } from "..";
+import { Movable } from "..";
 import { Vector2D } from "System/Utilities";
 
 export class Physic extends BaseComponent {
@@ -13,7 +13,7 @@ export class Physic extends BaseComponent {
 
     public checkCollision(object: GameObject): boolean {
         const sub: Vector2D = this.Object.Transform.Position.subtract(object.Transform.Position);
-        const distance = sub.length;
+        const distance = sub.Length;
         if (distance < this.Object.Transform.Size.Width + object.Transform.Size.Width) {
             this._onCollision?.apply(this, [object, this]);
             object.getComponent(Physic)._onCollision?.apply(this, [this.Object, object.getComponent(Physic)]);
@@ -24,11 +24,11 @@ export class Physic extends BaseComponent {
     }
 
     private _bounce(object: GameObject): void {
-        let moved: Moved | null = this.Object.tryGetComponent(Moved);
+        let moved: Movable | null = this.Object.tryGetComponent(Movable);
         if (moved === null) {
-            moved = this.Object.addComponent(Moved);
+            moved = this.Object.addComponent(Movable);
         }
-        const relativeVelocity = moved.Velocity.subtract(object.tryGetComponent(Moved)?.Velocity ?? new Vector2D(0, 0));
+        const relativeVelocity = moved.Velocity.subtract(object.tryGetComponent(Movable)?.Velocity ?? new Vector2D(0, 0));
         const dx = this.Object.Transform.Position.X - object.Transform.Position.X;
         const dy = this.Object.Transform.Position.Y - object.Transform.Position.Y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -48,8 +48,8 @@ export class Physic extends BaseComponent {
         }
 
         if (object.tryGetComponent(Physic)!.Mass !== Infinity) {
-            object.tryGetComponent(Moved)!.Velocity.X -= (impulse * normal.X) / object.tryGetComponent(Physic)!.Mass;
-            object.tryGetComponent(Moved)!.Velocity.Y -= (impulse * normal.Y) / object.tryGetComponent(Physic)!.Mass;
+            object.tryGetComponent(Movable)!.Velocity.X -= (impulse * normal.X) / object.tryGetComponent(Physic)!.Mass;
+            object.tryGetComponent(Movable)!.Velocity.Y -= (impulse * normal.Y) / object.tryGetComponent(Physic)!.Mass;
         }
     }
 }

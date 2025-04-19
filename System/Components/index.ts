@@ -1,4 +1,5 @@
 export * from "./Tranformed/Transformed";
-export * from "./Moved/Moved";
+export * from "./Movable/Movable";
 export * from "./Physic/Physic";
-export * from "./Drawed/Drawed";
+export * from "./Drawable/Drawable";
+export * from "./Dictionary/Dictionary";

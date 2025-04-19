@@ -1,4 +1,4 @@
-import { Moved, Physic } from "System/Components";
+import { Movable, Physic } from "System/Components";
 import { GameObject } from "..";
 import { Vector2D } from "System/Utilities";
 
@@ -21,13 +21,13 @@ export class GameEngine {
     }
 
     private _updatePhysic(_deltaTime: number): void {
-        const objects: GameObject[] = GameObject.selectByComponent(Physic);
-        for (let i: number = 0; i < objects.length; i++) {
-            objects[i].getComponent(Moved).Velocity = new Vector2D(0, this._Gravity);
-            for (let j: number = objects.length - 1; j >= 0 && objects[i].Id !== objects[j].Id; j--) {
-                objects[i].getComponent(Physic).checkCollision(objects[j]);
-            }
-        }
+        // const objects: GameObject[] = GameObject.selectByComponent(Physic);
+        // for (let i: number = 0; i < objects.length; i++) {
+        //     objects[i].getComponent(Movable).Velocity = new Vector2D(0, this._Gravity);
+        //     for (let j: number = objects.length - 1; j >= 0 && objects[i].Id !== objects[j].Id; j--) {
+        //         objects[i].getComponent(Physic).checkCollision(objects[j]);
+        //     }
+        // }
     }
 
     public update(deltaTime: number): void {

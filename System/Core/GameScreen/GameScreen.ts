@@ -1,4 +1,5 @@
-import { BaseObject, GameEngine, GameScene } from "..";
+import { Vector2D } from "System/Utilities";
+import { BaseObject, GameEngine, GameObject, GameScene } from "..";
 
 export class GameScreen extends BaseObject {
     constructor(target: HTMLElement, name?: string, _width?: number, _height?: number) {
@@ -11,6 +12,19 @@ export class GameScreen extends BaseObject {
         this._setSize();
         window.addEventListener('resize', () => {
             this._setSize();
+        });
+
+        window.addEventListener('click', e => {
+            this._onClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
+        });
+
+        window.addEventListener('contextmenu', e => {
+            e.stopPropagation();
+            this._onRightClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
+        });
+
+        window.addEventListener('mousemove', e => {
+            this._onMouseMove?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
         });
     }
 
@@ -40,6 +54,18 @@ export class GameScreen extends BaseObject {
     public onAddScene(action: (scene: GameScene) => void): void {
         this._onAddScene = action;
     }
+    private _onClick?: (cursor: Vector2D, scene: GameScreen) => void;
+    public onClick(action: (cursor: Vector2D, scene: GameScreen) => void): void {
+        this._onClick = action;
+    }
+    private _onRightClick?: (cursor: Vector2D, scene: GameScreen) => void;
+    public onRightClick(action: (cursor: Vector2D, scene: GameScreen) => void): void {
+        this._onRightClick = action;
+    }
+    private _onMouseMove?: (cursor: Vector2D, scene: GameScreen) => void;
+    public onMouseMove(action: (cursor: Vector2D, scene: GameScreen) => void): void {
+        this._onMouseMove = action;
+    }
     //#endregion
 
     //#region METHODS
@@ -66,6 +92,41 @@ export class GameScreen extends BaseObject {
                 scene.update(deltaTime);
                 this.Context?.restore();
             });
+        this._onUpdate?.apply(this, [deltaTime]);
+        if (this._IsShowFPS) {
+            this.Context!.beginPath();
+            this.Context!.globalAlpha = 0.75;
+            this.Context!.fillStyle = 'black';
+            this.Context!.fillRect(10, 10, 70, 24);
+            this.Context!.closePath();
+            this.Context!.beginPath();
+            this.Context!.globalAlpha = 1;
+            this.Context!.textAlign = 'center';
+            this.Context!.strokeStyle = '#00fb00';
+            this.Context!.textBaseline = 'middle';
+            this.Context!.font = 'lighter 18px sans-serif';
+            this.Context!.moveTo(35, 22);
+            this.Context!.fillStyle = '#00fb00';
+            this.Context!.fillText(`FPS: ${this._onShowFPS()}`, 45, 22, 70);
+            this.Context!.closePath();
+        }
+        if (this._IsShowEntitiesCount) {
+            this.Context!.beginPath();
+            this.Context!.globalAlpha = 0.75;
+            this.Context!.fillStyle = 'black';
+            this.Context!.fillRect(10, 35, 100, 24);
+            this.Context!.closePath();
+            this.Context!.beginPath();
+            this.Context!.globalAlpha = 1;
+            this.Context!.textAlign = 'left';
+            this.Context!.strokeStyle = '#00fb00';
+            //this.Context!.textBaseline = 'middle';
+            this.Context!.font = 'lighter 18px sans-serif';
+            this.Context!.moveTo(10, 35);
+            this.Context!.fillStyle = '#00fb00';
+            this.Context!.fillText(`Count: ${GameObject.AllAsArray.length}`, 10, 47);
+            this.Context!.closePath();
+        }
     }
     public play = (currentTime: number = 0): void => {
         const deltaTime = (currentTime - this._LastTime) / 1000;
@@ -73,8 +134,25 @@ export class GameScreen extends BaseObject {
         this.update(deltaTime);
         this._Loop = requestAnimationFrame(this.play);
     }
-    public pause(): void {
+    public pause = (): void => {
         cancelAnimationFrame(this._Loop);
+    }
+    private _IsShowFPS: boolean = false;
+    private _Times: number[] = [];
+    private _onShowFPS = (): number => {
+        const now: number = performance.now();
+        while (this._Times.length > 0 && this._Times[0] <= now - 1000) {
+            this._Times.shift();
+        }
+        this._Times.push(now);
+        return this._Times.length;
+    }
+    public showFPS = (flag: boolean = true): void => {
+        this._IsShowFPS = flag;
+    }
+    private _IsShowEntitiesCount: boolean = false;
+    public showEntitiesCount = (flag: boolean = true): void => {
+        this._IsShowEntitiesCount = flag;
     }
     public destroy(): void {
         this.Canvas.parentElement?.removeChild(this.Canvas);

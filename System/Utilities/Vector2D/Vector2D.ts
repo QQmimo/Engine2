@@ -16,7 +16,7 @@ export class Vector2D {
     }
 
     public normalize(): Vector2D {
-        const length = this.length;
+        const length = this.Length;
         return new Vector2D(this.X / length, this.Y / length);
     }
 
@@ -29,11 +29,14 @@ export class Vector2D {
     }
 
     public distance(vector: Vector2D): number {
-        return this.subtract(vector).length;
+        return this.subtract(vector).Length;
     }
 
-    public get length(): number {
+    public get Length(): number {
         return Math.sqrt(this.X * this.X + this.Y * this.Y);
     }
 
+    public get IsZero(): boolean {
+        return this.X === 0 && this.Y === 0;
+    }
 }

@@ -1,6 +1,6 @@
 import { BaseComponent, GameScreen } from "System/Core";
 
-export class Drawed extends BaseComponent {
+export class Drawable extends BaseComponent {
     private get _Screen(): GameScreen {
         return this.Object.Layer.Scene.Screen;
     }
