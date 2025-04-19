@@ -1,7 +1,3 @@
-import { Movable, Physic } from "System/Components";
-import { GameObject } from "..";
-import { Vector2D } from "System/Utilities";
-
 export class GameEngine {
     private _Gravity: number = 0;
     public get Gravity(): number {

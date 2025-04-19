@@ -2,7 +2,7 @@ import { BaseComponent, GameObject } from "System/Core";
 import { Vector2D } from "System/Utilities";
 
 export class Movable extends BaseComponent {
-    private IsCollidable: boolean = false;
+    public IsCollidable: boolean  = false;
 
     private _Forces: Set<Vector2D> = new Set<Vector2D>();
     public get Forces(): Set<Vector2D> {
