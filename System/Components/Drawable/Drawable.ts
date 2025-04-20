@@ -13,7 +13,17 @@ export class Drawable extends BaseComponent {
             this.Object.Transform.Size.Width,
             0,
             360);
-        this._Screen.Context!.fillStyle = this.Object.Transform.Fill!;
+        const gradient = this._Screen.Context!.createRadialGradient(
+            this.Object.Transform.Position.X,
+            this.Object.Transform.Position.Y,
+            0,
+            this.Object.Transform.Position.X,
+            this.Object.Transform.Position.Y,
+            this.Object.Transform.Size.Width
+        );
+        gradient.addColorStop(0, this.Object.Transform.Fill ?? 'red');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        this._Screen.Context!.fillStyle = gradient;
         this._Screen.Context!.fill();
         this._Screen.Context!.closePath();
     }
