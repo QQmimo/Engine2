@@ -4,14 +4,14 @@ export class BaseObject {
     constructor(name: string) {
         this.Id = Guid.new();
         this.Name = name;
-        this.Tags = [];
+        this.Tags = new Set<string>();
         BaseObject.add(this);
     }
 
     //#region FIELDS
     public readonly Name: string;
     public readonly Id: string;
-    public readonly Tags: string[];
+    public readonly Tags: Set<string>;
     //#endregion
 
     //#region EVENTS
@@ -27,7 +27,10 @@ export class BaseObject {
 
     //#region METHODS
     public addTag(tag: string): void {
-        this.Tags.push(tag);
+        this.Tags.add(tag);
+    }
+    public deleteTag(tag: string): void {
+        this.Tags.delete(tag);
     }
     public destroy(): void {
         BaseObject.delete(this.Id);
@@ -38,9 +41,9 @@ export class BaseObject {
     //#region GLOBAL
     protected static All: Map<string, BaseObject> = new Map();
     protected static get AllAsArray(): BaseObject[] {
-        return Array
-            .from(this.All, ([_key, value]) => value)
-            .filter(object => object.constructor.name === this.name);
+        const result: BaseObject[] = [];
+        this.All.forEach(object => object.constructor.name === this.name ? result.push(object) : null);
+        return result;
     }
 
     protected static add(object: BaseObject): void {
@@ -51,13 +54,13 @@ export class BaseObject {
     }
 
     public static findById(id: string): BaseObject | null {
-        return (this.AllAsArray as BaseObject[]).find(object => this.name === object.constructor.name && object.Id === id) ?? null;
+        return this.AllAsArray.find(object => this.name === object.constructor.name && object.Id === id) ?? null;
     }
     public static findByName(name: string): BaseObject | null {
-        return (this.AllAsArray as BaseObject[]).find(object => this.name === object.constructor.name && object.Name === name) ?? null;
+        return this.AllAsArray.find(object => this.name === object.constructor.name && object.Name === name) ?? null;
     }
     public static selectByTag(tag: string): BaseObject[] {
-        return (this.AllAsArray as BaseObject[]).filter(object => object.Tags.includes(tag));
+        return this.AllAsArray.filter(object => object.Tags.has(tag));
     }
     public static showAll(): BaseObject[] {
         return this.AllAsArray;

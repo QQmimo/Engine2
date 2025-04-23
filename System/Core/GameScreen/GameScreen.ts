@@ -19,12 +19,17 @@ export class GameScreen extends BaseObject {
         });
 
         window.addEventListener('contextmenu', e => {
-            e.stopPropagation();
             this._onRightClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
+            e.preventDefault();
         });
 
         window.addEventListener('mousemove', e => {
             this._onMouseMove?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
+        });
+
+        window.addEventListener('keypress', e => {
+            this._onKeyPress?.apply(this, [e.key]);
+            e.preventDefault();
         });
     }
 
@@ -66,6 +71,10 @@ export class GameScreen extends BaseObject {
     public onMouseMove(action: (cursor: Vector2D, scene: GameScreen) => void): void {
         this._onMouseMove = action;
     }
+    private _onKeyPress?: (key: string) => void;
+    public onKeyPress(action: (key: string) => void): void {
+        this._onKeyPress = action;
+    }
     //#endregion
 
     //#region METHODS
@@ -101,13 +110,13 @@ export class GameScreen extends BaseObject {
             this.Context!.closePath();
             this.Context!.beginPath();
             this.Context!.globalAlpha = 1;
-            this.Context!.textAlign = 'center';
+            this.Context!.textAlign = 'left';
             this.Context!.strokeStyle = '#00fb00';
             this.Context!.textBaseline = 'middle';
             this.Context!.font = 'lighter 18px sans-serif';
-            this.Context!.moveTo(35, 22);
+            // this.Context!.moveTo(35, 22);
             this.Context!.fillStyle = '#00fb00';
-            this.Context!.fillText(`FPS: ${this._onShowFPS()}`, 45, 22, 70);
+            this.Context!.fillText(`FPS: ${this._onShowFPS()}`, 12, 22, 70);
             this.Context!.closePath();
         }
         if (this._IsShowEntitiesCount) {
@@ -122,9 +131,9 @@ export class GameScreen extends BaseObject {
             this.Context!.strokeStyle = '#00fb00';
             //this.Context!.textBaseline = 'middle';
             this.Context!.font = 'lighter 18px sans-serif';
-            this.Context!.moveTo(10, 35);
+            // this.Context!.moveTo(35, 22);
             this.Context!.fillStyle = '#00fb00';
-            this.Context!.fillText(`Count: ${GameObject.AllAsArray.length}`, 10, 47);
+            this.Context!.fillText(`Count: ${GameObject.AllAsArray.length}`, 12, 47);
             this.Context!.closePath();
         }
     }
