@@ -14,23 +14,26 @@ export class GameScreen extends BaseObject {
             this._setSize();
         });
 
-        window.addEventListener('click', e => {
+        this.Canvas.addEventListener('click', e => {
             this._onClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
         });
 
-        window.addEventListener('contextmenu', e => {
+        this.Canvas.addEventListener('contextmenu', e => {
             this._onRightClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
             e.preventDefault();
         });
 
-        window.addEventListener('mousemove', e => {
+        this.Canvas.addEventListener('mousemove', e => {
             this._onMouseMove?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
         });
 
-        window.addEventListener('keypress', e => {
+        this.Canvas.addEventListener('keypress', e => {
             this._onKeyPress?.apply(this, [e.key]);
             e.preventDefault();
         });
+
+        this._GameEngine = new GameEngine();
+        this._GameEngine.setGrid(150, 150, this.Width, this.Height);
     }
 
     private _setSize(): void {
@@ -40,7 +43,7 @@ export class GameScreen extends BaseObject {
     }
     private _LastTime: number = 0;
     private _Loop: number = 0;
-    private _GameEngine: GameEngine = new GameEngine();
+    private _GameEngine: GameEngine;
 
     //#region FIELDS
     private readonly Scenes: Map<string, GameScene>;
@@ -96,6 +99,16 @@ export class GameScreen extends BaseObject {
     public update(deltaTime: number): void {
         this._GameEngine.update(deltaTime);
         this.Context?.clearRect(0, 0, this.Width, this.Height);
+
+        this._GameEngine.Areas.forEach(area => {
+            this.Context?.restore();
+            this.Context!.beginPath();
+            this.Context!.strokeRect(area.minX, area.minY, area.maxX - area.minX, area.maxY - area.minY);
+            this.Context!.strokeStyle = 'rgba(255, 125, 0, 0.5)';
+            this.Context!.stroke();
+            this.Context!.closePath();
+        });
+
         this.Scenes
             .forEach(scene => {
                 scene.update(deltaTime);
@@ -114,7 +127,6 @@ export class GameScreen extends BaseObject {
             this.Context!.strokeStyle = '#00fb00';
             this.Context!.textBaseline = 'middle';
             this.Context!.font = 'lighter 18px sans-serif';
-            // this.Context!.moveTo(35, 22);
             this.Context!.fillStyle = '#00fb00';
             this.Context!.fillText(`FPS: ${this._onShowFPS()}`, 12, 22, 70);
             this.Context!.closePath();
@@ -129,9 +141,7 @@ export class GameScreen extends BaseObject {
             this.Context!.globalAlpha = 1;
             this.Context!.textAlign = 'left';
             this.Context!.strokeStyle = '#00fb00';
-            //this.Context!.textBaseline = 'middle';
             this.Context!.font = 'lighter 18px sans-serif';
-            // this.Context!.moveTo(35, 22);
             this.Context!.fillStyle = '#00fb00';
             this.Context!.fillText(`Count: ${GameObject.AllAsArray.length}`, 12, 47);
             this.Context!.closePath();
