@@ -52,9 +52,10 @@ screen.onUpdate(() => {
 
     all.forEach(obj => {
         if (obj.Transform.Position.distance(centerPoint) > 250) {
-            obj.getComponent(Movable).addForce(centerPoint.subtract(obj.Transform.Position).normalize().multiply(1 / 1000));
+            obj.getComponent(Movable).addForce(centerPoint.subtract(obj.Transform.Position).normalize().multiply(1 / 10));
         }
         else {
+            obj.getComponent(Movable).addForce(centerPoint.subtract(obj.Transform.Position).normalize().multiply(-1 / 5));
             screen.Context!.beginPath();
             screen.Context!.moveTo(obj.Transform.Position.X, obj.Transform.Position.Y);
             screen.Context!.lineTo(centerPoint.X, centerPoint.Y);
