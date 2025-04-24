@@ -33,6 +33,10 @@ export class Movable extends BaseComponent {
         this._Velocity = this._Velocity.add(force);
     }
 
+    public stop(): void {
+        this._Velocity = new Vector2D(0, 0);
+    }
+
     private _bounce(object: GameObject): void {
         let moved: Movable | null = this.Object.tryGetComponent(Movable);
         if (moved === null) {

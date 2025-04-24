@@ -5,7 +5,7 @@ export class BaseComponent {
         this.Object = object;
     }
 
-    protected Object: GameObject;
+    public readonly Object: GameObject;
     public update(_deltaTime: number): void {
 
     };

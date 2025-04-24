@@ -30,16 +30,16 @@ export class GameEngine {
     public get Areas(): IArea[] {
         return this._Areas;
     }
-    public setGrid(width: number, height: number, screenWidth: number, screenHeight: number): void {
-        const countRows: number = Math.ceil(screenHeight / height) + 1;
-        const countColumns: number = Math.ceil(screenWidth / width) + 1;
+    public setGrid(width: number, height: number, screenWidth: number, screenHeight: number, screenLeft: number = 0, screenTop: number = 0): void {
+        const countRows: number = Math.ceil((screenHeight + screenTop) / height);
+        const countColumns: number = Math.ceil((screenWidth + screenLeft) / width);
         for (let rowIndex: number = 0; rowIndex < countRows; rowIndex++) {
             for (let columnIndex: number = 0; columnIndex < countColumns; columnIndex++) {
                 this._Areas.push({
-                    minX: (columnIndex - 1) * width,
-                    minY: (rowIndex - 1) * height,
-                    maxX: (columnIndex + 1) * width,
-                    maxY: (rowIndex + 1) * height
+                    minX: (columnIndex - 1) * width + screenLeft,
+                    minY: (rowIndex - 1) * height + screenTop,
+                    maxX: (columnIndex + 1) * width + screenLeft,
+                    maxY: (rowIndex + 1) * height + screenTop
                 });
             }
         }
@@ -51,10 +51,10 @@ export class GameEngine {
 
         this._Areas.forEach(collisionArea => {
             const objectsInArea: GameObject[] = movableObjects
-                .filter(obj => obj.Transform.Position.X >= collisionArea.minX
-                    && obj.Transform.Position.Y >= collisionArea.minY
-                    && obj.Transform.Position.X <= collisionArea.maxX
-                    && obj.Transform.Position.Y <= collisionArea.maxY
+                .filter(obj => obj.Transform.Position.X > collisionArea.minX
+                    && obj.Transform.Position.Y > collisionArea.minY
+                    && obj.Transform.Position.X < collisionArea.maxX
+                    && obj.Transform.Position.Y < collisionArea.maxY
                 )
 
             for (let i: number = 0; i < objectsInArea.length; i++) {

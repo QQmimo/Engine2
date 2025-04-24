@@ -1,5 +1,5 @@
 import { Vector2D } from "System/Utilities";
-import { BaseObject, GameEngine, GameObject, GameScene } from "..";
+import { BaseObject, GameEngine, GameObject, GameScene, IArea } from "..";
 
 export class GameScreen extends BaseObject {
     constructor(target: HTMLElement, name?: string, _width?: number, _height?: number) {
@@ -19,21 +19,24 @@ export class GameScreen extends BaseObject {
         });
 
         this.Canvas.addEventListener('contextmenu', e => {
-            this._onRightClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
             e.preventDefault();
+            this._onRightClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
         });
 
         this.Canvas.addEventListener('mousemove', e => {
             this._onMouseMove?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
         });
 
-        this.Canvas.addEventListener('keypress', e => {
-            this._onKeyPress?.apply(this, [e.key]);
-            e.preventDefault();
+        window.addEventListener('keydown', e => {
+            this._onKeyDown?.apply(this, [e.key]);
+        });
+
+        window.addEventListener('keyup', e => {
+            this._onKeyUp?.apply(this, [e.key]);
         });
 
         this._GameEngine = new GameEngine();
-        this._GameEngine.setGrid(150, 150, this.Width, this.Height);
+        this.setGridSize(150, 150);
     }
 
     private _setSize(): void {
@@ -55,6 +58,9 @@ export class GameScreen extends BaseObject {
     public get Height(): number {
         return this.Canvas.height;
     }
+    public get Areas(): IArea[] {
+        return this._GameEngine.Areas;
+    }
     //#endregion
 
     //#region EVENTS
@@ -74,13 +80,20 @@ export class GameScreen extends BaseObject {
     public onMouseMove(action: (cursor: Vector2D, scene: GameScreen) => void): void {
         this._onMouseMove = action;
     }
-    private _onKeyPress?: (key: string) => void;
-    public onKeyPress(action: (key: string) => void): void {
-        this._onKeyPress = action;
+    private _onKeyDown?: (key: string) => void;
+    public onKeyDown(action: (key: string) => void): void {
+        this._onKeyDown = action;
+    }
+    private _onKeyUp?: (key: string) => void;
+    public onKeyUp(action: (key: string) => void): void {
+        this._onKeyUp = action;
     }
     //#endregion
 
     //#region METHODS
+    public setGridSize(gridWidth: number, gridHeight: number, screenWidth: number = this.Width, screenHeight: number = this.Height, screenLeft: number = 0, screenTop: number = 0): void {
+        this._GameEngine.setGrid(gridWidth, gridHeight, screenWidth, screenHeight, screenLeft, screenTop);
+    }
     public addScene(name?: string): GameScene {
         const scene: GameScene = new GameScene(this, name);
         if (this.findSceneById(scene.Id) !== null) {

@@ -72,7 +72,7 @@ export class Random {
      * @param maxX - максимальное значение координаты x
      * @param maxY - максимальное значение координаты y
      */
-    public static Vector2D(maxX: number, maxY: number): Vector2D {
-        return new Vector2D(Math.random() * maxX, Math.random() * maxY);
+    public static Vector2D(minX: number, maxX: number, minY: number, maxY: number): Vector2D {
+        return new Vector2D(Random.Float(minX, maxX), Random.Float(minY, maxY));
     }
 }
