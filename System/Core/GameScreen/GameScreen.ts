@@ -1,5 +1,5 @@
 import { Vector2D } from "System/Utilities";
-import { BaseObject, GameEngine, GameObject, GameScene, IArea } from "..";
+import { BaseObject, GameEngine, GameObject, GameScene } from "..";
 
 export class GameScreen extends BaseObject {
     constructor(target: HTMLElement, name?: string, _width?: number, _height?: number) {
@@ -14,16 +14,16 @@ export class GameScreen extends BaseObject {
             this._setSize();
         });
 
-        this.Canvas.addEventListener('click', e => {
+        window.addEventListener('click', e => {
             this._onClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
         });
 
-        this.Canvas.addEventListener('contextmenu', e => {
+        window.addEventListener('contextmenu', e => {
             e.preventDefault();
             this._onRightClick?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
         });
 
-        this.Canvas.addEventListener('mousemove', e => {
+        window.addEventListener('mousemove', e => {
             this._onMouseMove?.apply(this, [new Vector2D(e.clientX, e.clientY), this]);
         });
 
@@ -57,9 +57,6 @@ export class GameScreen extends BaseObject {
     }
     public get Height(): number {
         return this.Canvas.height;
-    }
-    public get Areas(): IArea[] {
-        return this._GameEngine.Areas;
     }
     //#endregion
 
@@ -113,20 +110,12 @@ export class GameScreen extends BaseObject {
         this._GameEngine.update(deltaTime);
         this.Context?.clearRect(0, 0, this.Width, this.Height);
 
-        this._GameEngine.Areas.forEach(area => {
-            this.Context?.restore();
-            this.Context!.beginPath();
-            this.Context!.strokeRect(area.minX, area.minY, area.maxX - area.minX, area.maxY - area.minY);
-            this.Context!.strokeStyle = 'rgba(255, 125, 0, 0.5)';
-            this.Context!.stroke();
-            this.Context!.closePath();
-        });
-
         this.Scenes
             .forEach(scene => {
                 scene.update(deltaTime);
                 this.Context?.restore();
             });
+
         this._onUpdate?.apply(this, [deltaTime]);
         if (this._IsShowFPS) {
             this.Context!.beginPath();

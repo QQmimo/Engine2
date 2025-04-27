@@ -6,10 +6,14 @@ export class Movable extends BaseComponent {
     public Flex: number = 0.4;
     public IsCollidable: boolean = false;
 
-    public _Velocity: Vector2D = new Vector2D(0, 0);
+    private _Velocity: Vector2D = new Vector2D(0, 0);
     public get Velocity(): Vector2D {
-        return this._Velocity;
+        return this.VelocityLimit === null || this._Velocity.Length <= this.VelocityLimit ?
+            this._Velocity :
+            this._Velocity.normalize().multiply(this.VelocityLimit);
     }
+
+    public VelocityLimit: number | null = null;
 
     public get IsMoving(): boolean {
         return !this.Velocity.IsZero;
@@ -38,11 +42,11 @@ export class Movable extends BaseComponent {
     }
 
     private _bounce(object: GameObject): void {
-        let moved: Movable | null = this.Object.tryGetComponent(Movable);
+        let moved: Movable | null = this.Object.getComponent(Movable);
         if (moved === null) {
             moved = this.Object.addComponent(Movable);
         }
-        const relativeVelocity = moved.Velocity.subtract(object.tryGetComponent(Movable)?.Velocity ?? new Vector2D(0, 0));
+        const relativeVelocity = moved.Velocity.subtract(object.getComponent(Movable)?.Velocity ?? new Vector2D(0, 0));
         const dx = this.Object.Transform.Position.X - object.Transform.Position.X;
         const dy = this.Object.Transform.Position.Y - object.Transform.Position.Y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -53,7 +57,7 @@ export class Movable extends BaseComponent {
             return;
         }
         const j = -(1 + this.Flex + object.getComponent(Movable).Flex) * velocityAlongNormal;
-        const invMassSum = (this.Mass !== Infinity ? 1 / this.Mass : 0) + (object.tryGetComponent(Movable)!.Mass !== Infinity ? 1 / object.tryGetComponent(Movable)!.Mass : 0);
+        const invMassSum = (this.Mass !== Infinity ? 1 / this.Mass : 0) + (object.getComponent(Movable)!.Mass !== Infinity ? 1 / object.getComponent(Movable)!.Mass : 0);
         const impulse = j / invMassSum;
 
         if (this.Mass !== Infinity) {
@@ -63,10 +67,10 @@ export class Movable extends BaseComponent {
             ));
         }
 
-        if (object.tryGetComponent(Movable)!.Mass !== Infinity) {
-            object.tryGetComponent(Movable)!.addForce(new Vector2D(
-                -(impulse * normal.X) / object.tryGetComponent(Movable)!.Mass,
-                -(impulse * normal.Y) / object.tryGetComponent(Movable)!.Mass
+        if (object.getComponent(Movable).Mass !== Infinity) {
+            object.getComponent(Movable).addForce(new Vector2D(
+                -(impulse * normal.X) / object.getComponent(Movable)!.Mass,
+                -(impulse * normal.Y) / object.getComponent(Movable)!.Mass
             ));
         }
     }
@@ -87,6 +91,10 @@ export class Movable extends BaseComponent {
 
     public update(deltaTime: number): void {
         this.Object.Transform.Position = this.Object.Transform.Position.add(this.Velocity.multiply(deltaTime));
+
+        if (this.Velocity.Length <= 0.5) {
+            this._Velocity = new Vector2D(0, 0);
+        }
 
         if (this.IsMoving) {
             this._onMoving?.apply(this, [this.Object, this]);

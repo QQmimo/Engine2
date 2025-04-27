@@ -28,6 +28,10 @@ export class Vector2D {
         return new Vector2D(this.X * scalar, this.Y * scalar);
     }
 
+    public reverse(): Vector2D {
+        return new Vector2D(-this.X, -this.Y);
+    }
+
     public distance(vector: Vector2D): number {
         return this.subtract(vector).Length;
     }
