@@ -6,14 +6,14 @@ const screen: GameScreen = new GameScreen(document.body);
 const scene: GameScene = screen.addScene();
 const layer: GameLayer = scene.addLayer();
 
-for (let i: number = 0; i < 2500; i++) {
+for (let i: number = 0; i < 10000; i++) {
     const obj: GameObject = new GameObject(layer);
 
     obj.addComponent(Drawable);
     obj.addComponent(Movable);
 
     obj.Transform.Position = Random.Vector2D(0, screen.Width, 0, screen.Height);
-    obj.Transform.Size = new Size(Random.Integer(5, 10), 0);
+    obj.Transform.Size = new Size(Random.Integer(1, 5), 0);
     obj.Transform.Fill = 'Green';
 
     const movable = obj.getComponent(Movable);
@@ -29,7 +29,7 @@ for (let i: number = 0; i < 2500; i++) {
 const centerPoint: Vector2D = new Vector2D(screen.Width / 2, screen.Height / 2);
 const all: GameObject[] = GameObject.selectByComponent(Movable)
     .filter(o => o.getComponent(Movable).IsCollidable);
-screen.setGridSize(75, 75);
+screen.setGridSize(10, 10);
 
 screen.onUpdate(() => {
     all.forEach(obj => {
@@ -41,7 +41,7 @@ screen.onUpdate(() => {
         // screen.Context!.stroke();
         // screen.Context!.closePath();     
 
-        if (obj.Transform.Position.distance(centerPoint) > 1000) {
+        if (obj.Transform.Position.distance(centerPoint) > 1100) {
             obj.getComponent(Movable).addForce(obj.Transform.Position.subtract(centerPoint).multiply(-10).normalize());
         }
     });
